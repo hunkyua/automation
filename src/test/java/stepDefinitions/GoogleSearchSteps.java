@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class GoogleSearchSteps {
@@ -16,7 +17,8 @@ public class GoogleSearchSteps {
     public void browser_is_open() {
         System.out.println("browser_is_open");
         String driverPath = System.getProperty("user.dir").replace("\\", "/");
-        System.setProperty("webdriver.chrome.driver", driverPath + "/src/test/resources/web_drivers/chromedriver.exe");
+        String chromeDriver = chromeDriverBasedOnOS();
+        System.setProperty("webdriver.chrome.driver", driverPath + "/src/test/resources/web_drivers/" + chromeDriver);
         driver = new ChromeDriver();
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
@@ -46,5 +48,21 @@ public class GoogleSearchSteps {
 
         driver.close();
         driver.quit();
+    }
+
+    private String chromeDriverBasedOnOS() {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.getDefault());
+
+        if (osName.contains("win")) {
+            return "chromedriver.exe";
+        } else if (osName.contains("mac")) {
+            return "chromedriver";
+        } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
+            return "chromedriver";
+        } else if (osName.contains("sunos")) {
+            return "chromedriver";
+        } else {
+            return "chromedriver";
+        }
     }
 }
