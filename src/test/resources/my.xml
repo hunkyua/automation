@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+    <test name="My Test">
+        <parameter name="cucumber.features" value="src/test/resources/features/googleSearch.feature"/>
+        <parameter name="cucumber.glue" value="com.example.steps"/>
+        <parameter name="cucumber.plugin" value="pretty, junit:target/JUnitReports/report.xml"/>
+        <parameter name="cucumber.monochrome" value="true"/>
+        <classes>
+            <class name="org.example.TestRunner"/>
+        </classes>
+    </test>
+</suite>
