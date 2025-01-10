@@ -5,23 +5,35 @@ import io.cucumber.messages.types.Envelope;
 import io.cucumber.messages.types.Feature;
 import io.cucumber.messages.types.GherkinDocument;
 import io.cucumber.messages.types.Scenario;
-import io.cucumber.testng.AbstractTestNGCucumberTests;
-import io.cucumber.testng.CucumberOptions;
-import io.cucumber.testng.FeatureWrapper;
-import io.cucumber.testng.PickleWrapper;
+import io.cucumber.testng.*;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlTest;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.stream.Stream;
-public class TestRunner extends AbstractTestNGCucumberTests {
+public class TestRunner {
+    TestNGCucumberRunner testNGCucumberRunner;
+    public TestRunner() {
+        super();
+    }
 
-    @Override
+    @BeforeClass(alwaysRun = true)
+    public void setUpClass(ITestContext context) {
+        XmlTest currentXmlTest = context.getCurrentXmlTest();
+        Objects.requireNonNull(currentXmlTest);
+        CucumberPropertiesProvider properties = currentXmlTest::getParameter;
+        this.testNGCucumberRunner = new TestNGCucumberRunner(this.getClass(), properties);
+    }
+
     @DataProvider
     public Object[][] scenarios() {
-        return super.scenarios();
+        return testNGCucumberRunner.provideScenarios();
     }
 
     @Test(dataProvider="scenarios")
@@ -32,7 +44,7 @@ public class TestRunner extends AbstractTestNGCucumberTests {
         System.out.println(featureFilePath);
         Path featureContent = Paths.get(featureFilePath);
 
-        System.out.println(featureContent);
+        System.out.println("FeatureContent: " + featureContent);
         GherkinParser parser = GherkinParser.builder()
                 .includeSource(true)
                 .includePickles(true)
@@ -40,7 +52,7 @@ public class TestRunner extends AbstractTestNGCucumberTests {
                 .build();
 
         Stream<Envelope> envelopes = parser.parse(featureContent);
-        System.out.println(envelopes);
+        System.out.println("Envelopes: " + envelopes);
 
         // Process the envelopes
         envelopes.forEach(envelope -> {
@@ -65,5 +77,6 @@ public class TestRunner extends AbstractTestNGCucumberTests {
                 }
             }
         });
+        testNGCucumberRunner.runScenario(pickleWrapper.getPickle());
     }
 }
